@@ -1,0 +1,78 @@
+=== Job started on x1000c0s4b0n0 ===
+=== GPU INFO ===
+Wed Mar 11 02:23:09 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.163.01             Driver Version: 550.163.01     CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-40GB          On  |   00000000:81:00.0 Off |                    0 |
+| N/A   46C    P0             52W /  400W |       1MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+=== Starting Component 1: CUDA Simulation ===
+Starting CUDA Simulation for 1000000 events...
+Data saved to /home/users/ntu/rohan023/AMDProjects/gpu-failure-platform/data/telemetry_1m.csv
+=== Starting Component 2: Graph Analysis ===
+Building Failure Dependency Graph...
+Top Critical Nodes:
+ - GPU Core: 0.8000
+ - Voltage Reg: 0.6000
+ - Thermal Sensor: 0.4000
+ - Power Delivery: 0.2000
+ - Memory Controller: 0.2000
+ - Driver: 0.2000
+Graph saved to logs/failure_graph.png
+=== Starting Component 3a: Supervised ML (RF & XGBoost) ===
+Loading Telemetry Data for Supervised Learning...
+
+--- Training Random Forest Baseline ---
+Random Forest Results:
+                    precision    recall  f1-score   support
+
+            Stable       1.00      1.00      1.00    170032
+ Power Instability       0.99      0.98      0.99      9936
+Thermal Throttling       0.99      0.98      0.99     10035
+       Memory Leak       1.00      1.00      1.00      9997
+
+          accuracy                           1.00    200000
+         macro avg       1.00      0.99      0.99    200000
+      weighted avg       1.00      1.00      1.00    200000
+
+
+--- Training XGBoost Classifier ---
+XGBoost Results:
+                    precision    recall  f1-score   support
+
+            Stable       1.00      1.00      1.00    170032
+ Power Instability       0.99      0.98      0.99      9936
+Thermal Throttling       0.99      0.98      0.99     10035
+       Memory Leak       1.00      1.00      1.00      9997
+
+          accuracy                           1.00    200000
+         macro avg       0.99      0.99      0.99    200000
+      weighted avg       1.00      1.00      1.00    200000
+
+=== Starting Component 3b: Unsupervised ML (Isolation Forest) ===
+Loading Telemetry Data for Unsupervised Anomaly Detection...
+
+--- Training Isolation Forest ---
+Analysis Complete:
+ - Normal Execution States Detected: 850000
+ - Anomalous Hardware States Detected: 150000
+Anomaly detection model saved to models/iso_gpu_model.pkl
+=== Job Complete ===
+Numba version: 0.56.4
+CUDA available: True
+GPUs detected: <Managed Device 0>
+=== Job Complete ===

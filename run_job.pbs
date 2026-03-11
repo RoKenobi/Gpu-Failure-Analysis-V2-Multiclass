@@ -1,0 +1,56 @@
+#!/bin/bash
+#PBS -N gpu_failure_platform
+#PBS -l select=1:ncpus=16:mem=110G:ngpus=1
+#PBS -l walltime=02:00:00
+#PBS -q normal
+#PBS -P personal-rohan023
+#PBS -o logs/pbs_output.txt
+#PBS -e logs/pbs_error.txt
+
+cd $PBS_O_WORKDIR
+
+echo "=== Job started on $(hostname) ==="
+
+# Load modules
+module load miniforge3
+module load cuda/12.2.2   # Load CUDA module provided by the cluster
+
+# Activate conda env
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate test_ai_amd
+
+# Set Numba NVVM and libdevice paths from conda env
+export NUMBA_CUDA_NVVM=$CONDA_PREFIX/lib
+export NUMBA_CUDA_LIBDEVICE=$CONDA_PREFIX/lib/device
+
+# Check GPU availability
+echo "=== GPU INFO ==="
+nvidia-smi
+
+# Navigate to project
+cd $HOME/AMDProjects/gpu-failure-platform
+
+# Run pipeline
+echo "=== Starting Component 1: CUDA Simulation ==="
+python src/cuda_simulator.py
+
+echo "=== Starting Component 2: Graph Analysis ==="
+python src/graph_analyzer.py
+
+echo "=== Starting Component 3a: Supervised ML (RF & XGBoost) ==="
+python src/ml_supervised.py
+
+echo "=== Starting Component 3b: Unsupervised ML (Isolation Forest) ==="
+python src/ml_anomaly.py
+
+echo "=== Job Complete ==="
+
+python - <<EOF
+import numba
+from numba import cuda
+print("Numba version:", numba.__version__)
+print("CUDA available:", cuda.is_available())
+print("GPUs detected:", cuda.gpus)
+EOF
+
+echo "=== Job Complete ==="
