@@ -3,7 +3,7 @@
 #PBS -l select=1:ncpus=16:mem=110G:ngpus=1
 #PBS -l walltime=02:00:00
 #PBS -q normal
-#PBS -P personal-rohan023
+#PBS -P projec_id
 #PBS -o logs/pbs_output.txt
 #PBS -e logs/pbs_error.txt
 
